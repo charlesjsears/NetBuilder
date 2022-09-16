@@ -1,3 +1,5 @@
+#THESE ARE NEW CHANGES MADE FROM GITHUB
+
 numRooms = int(input('how many rooms are you planning to paint?:'))
 
 numWallsPerRoom = []
