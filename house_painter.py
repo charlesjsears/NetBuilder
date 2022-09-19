@@ -119,6 +119,7 @@ costPerGallon = 20
 numGallons = totalArea/sqftPerGallons
 cost = numGallons * costPerGallon
 print(f'It will take {numGallons} gallons of paint and will cost {cost} dollars')
+
 """
 roomOrWall = input('Are you planning on painting more than one wall?(y/n):')
 totalArea = 0
