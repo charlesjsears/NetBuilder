@@ -1,4 +1,6 @@
 
+from math import ceil
+
 #FUNCTIONS
 def area(width, height):
     return width * height
@@ -105,7 +107,7 @@ while (outsideOrInside != 'o') and (outsideOrInside != 'i'):
                 print(f"Your paint costs ${paintCost} per gallon")
 
                 #NUMBER OF GALLONS NEEDED TO COVER THE AREA
-                numGallons = (exArea/400)
+                numGallons = ceil(exArea/400)
                 numPrimer = 0
                 #ACCOUNTING FOR COATS (DIAMOND ONLY NEEDS 1)
                 if exPaint.type == 'regular':
@@ -143,7 +145,7 @@ while (outsideOrInside != 'o') and (outsideOrInside != 'i'):
                     print(f"Your paint for wall {i+1} costs ${paintCost} per gallon")
 
                     #NUMBER OF GALLONS NEEDED TO COVER THE AREA
-                    numGallons = (outWalls[i].area/400)
+                    numGallons = ceil(outWalls[i].area/400)
                     numPrimer = 0
 
                     #ACCOUNTING FOR COATS (DIAMOND ONLY NEEDS 1)
@@ -218,7 +220,7 @@ while (outsideOrInside != 'o') and (outsideOrInside != 'i'):
                 print(f"Your paint costs ${paintCost} per gallon")
 
                 #NUMBER OF GALLONS NEEDED TO COVER THE AREA
-                numGallons = (inArea/400)
+                numGallons = ceil(inArea/400)
                 numPrimer = 0
                 #ACCOUNTING FOR COATS (DIAMOND ONLY NEEDS 1)
                 if inPaint.type == 'regular':
@@ -256,7 +258,7 @@ while (outsideOrInside != 'o') and (outsideOrInside != 'i'):
                     print(f"Your paint for wall {i+1} costs ${paintCost} per gallon")
 
                     #NUMBER OF GALLONS NEEDED TO COVER THE AREA
-                    numGallons = (inWalls[i].area/400)
+                    numGallons = ceil(inWalls[i].area/400)
                     numPrimer = 0
 
                     #ACCOUNTING FOR COATS (DIAMOND ONLY NEEDS 1)
@@ -280,12 +282,3 @@ while (outsideOrInside != 'o') and (outsideOrInside != 'i'):
                 totalCost += inCost
     else:
         print("Please enter a valid answer")
-
-"""
-#dont want to paint windows or doors
-#don't paint sockets
-#different sized windows
-#find total paint in gallons and price
-#find the most cost effective method
-
-"""
