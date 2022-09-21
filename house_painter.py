@@ -60,7 +60,7 @@ def paintCheck (wallNum):
                 print("\nPlease enter regular, premium, or diamond\n")
     return paintType
 
-#ERROR HANDLING TO MAKE SURE A VALID PAINT TYPE IS CHOSEN
+#ERROR HANDLING TO MAKE SURE A VALID SHEEN TYPE IS CHOSEN
 def sheenCheck (wallNum):
     if wallNum == 0:
         sheenFlag = 0
@@ -273,7 +273,7 @@ if __name__ == '__main__':
     while (outsideOrInside != 'o') and (outsideOrInside != 'i'):
         outsideOrInside = input('Are you planning on painting the outside (o) or the inside (i)?:\n')
 
-#########################################################################
+#############################################################################
         #OUTSIDE
         if outsideOrInside == 'o':
             
@@ -323,6 +323,7 @@ if __name__ == '__main__':
                 tempWall.addDoor(0)
                 outWalls.append(tempWall)
             
+
             #FIND THE TOTAL AREA
             exArea = listArea(outWalls)
             for i in range(len(outWalls)):
@@ -343,7 +344,7 @@ if __name__ == '__main__':
 
                 print(f"Wall #{i+1} Total Area To Paint: {outWalls[i].area} sqft\n")
 
-            print(f"Total exterior area to be paint: {exArea} sqft\n")
+            print(f"Total exterior area to be painted: {exArea} sqft\n")
             #totalArea += exArea
 
             ########################################
@@ -382,28 +383,55 @@ if __name__ == '__main__':
             while sameSize != 'y' and sameSize != 'n':
                 sameSize = input('Are the inside walls of the house the same dimensions?(y/n):\n')
 
-                #DIFFERENT DIMENSIONS
+                #SAME DIMENSIONS
                 if sameSize == 'y':
                     width = inputNum(f'What is the width of the walls in ft?:\n')
                     height = inputNum(f'What is the height of the walls in ft?:\n')
                     for i in range(numInWalls):
                         inWalls.append(Wall(width, height))
+                        inWalls[i].addWindow(i+1)
+                        inWalls[i].addDoor(i+1)
 
-
-                #SAME DIMENSIONS
+                #DIFFERENT DIMENSIONS
                 elif sameSize == 'n':
                     for i in range(numInWalls):
                         width = inputNum(f'What is the width of wall #{i+1} in ft?:\n')
                         height = inputNum(f'What is the height of wall #{i+1} in ft?:\n')
                         inWalls.append(Wall(width, height))
+                        #SEE IF THERE ARE ANY WINDOWS ON THIS WALL
+                        inWalls[i].addWindow(i+1)
+                        #ANY DOORS ON THE WALL
+                        inWalls[i].addDoor(i+1)
 
                 #INVALID RESPONSE
                 else:
                     print("Please enter a valid answer\n")
             
-            inArea = listArea(inWalls)
-            print(f"Interior Area to be painted: {inArea} sqft\n")
+            
+            #print(f"Interior Area to be painted: {inArea} sqft\n")
             #totalArea += inArea
+
+            #PRINT WALL AREAS
+            inArea = listArea(inWalls)
+            for i in range(len(inWalls)):
+                numWindows = len(inWalls[i].windowList)
+                if numWindows > 0:
+                    print(f"\nWall #{i+1} contains {numWindows} window(s)")
+                    for j in range(numWindows):
+                        print(f"Window #{j+1} is {inWalls[i].windowList[j].area} sqft in area")
+                
+                numDoors = len(inWalls[i].doorList)
+                if numDoors > 0:
+                    print(f"\nWall #{i+1} contains {numDoors} door(s)")
+                    for j in range(numDoors):
+                        print(f"Door #{j+1} is {inWalls[i].doorList[j].area} sqft in area")
+
+                        if inWalls[i].doorList[j].painted == True:
+                            print(f"This door will be painted, therefor it will not subtract from the total area to be painted")
+
+                print(f"Wall #{i+1} Total Area To Paint: {inWalls[i].area} sqft\n")
+
+            print(f"Total interior area to be painted: {inArea} sqft\n")
 
             ####################################
             #CHOOSE PAINT
