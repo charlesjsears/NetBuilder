@@ -20,5 +20,5 @@ class TestClassDemoInstance:
         wall2 = Wall(4, 25)
         wall3 = Wall(10, 10)
         list = [wall1, wall2, wall3]
-        #assert listArea(list) == 300
-        assert listArea(list) == 301
+        assert listArea(list) == 300
+        #assert listArea(list) == 301
