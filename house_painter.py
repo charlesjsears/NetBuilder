@@ -1,4 +1,3 @@
-
 from math import ceil
 
 #FUNCTIONS
@@ -72,11 +71,55 @@ def choosePaint(area, wallList, numWalls, isExterior):
             #DIFFERENT PAINT
             elif samePaint == 'n':
                 cost = 0
+                paintList = []
+                #LOOP THROUGH EACH WALL ASKING WHAT PAINT TO USE
                 for i in range(len(wallList)):
-                    paint = paintSelection(i+1, isExterior)
-                    tempCost = paint.costForArea(wallList[i].area, i+1)
-                    print(f"Wall #{i+1} will cost ${tempCost}")
-                    cost += tempCost
+                    if i > 1:
+                        #IF MORE THAN 2 KINDS OF PAINT ASK IF THEY WANT TO REUSE ANOTHER KIND
+                        useSamePaint = ''
+                        while useSamePaint != 'y' and useSamePaint != 'n':
+                            useSamePaint = input(f"\nWould you like to use a paint you have already chosen for wall #{i+1}?(y/n):\n")
+                            
+                            #IF THEY WANT TO USE THE SAME PAINT
+                            if useSamePaint == 'y':
+                                #PRINT THE PAINT LIST
+                                for j in range(len(paintList)):
+                                    print(f"\nPAINT #{j+1}")
+                                    paintList[j].printPaint()
+
+                                #ASK THE USER WHICH PAINT THEY WANT TO REUSE
+                                paintFlag = False
+                                while paintFlag != True:
+                                    paintNum = inputNum(f"Which paint number would you like to use for wall #{i+1}?(1, 2, 3 ...):\n")
+                                    #CHECK IF IT IS A VALID PAINT NUMBER
+                                    if paintNum > len(paintList):
+                                        print('Please enter a valid paint number')
+                                    else:
+                                        #IF IT IS A VALID NUMBER, ASSIGN THE CURRENT PAINT TYPE TO THE REQUESTED NUMBER AND PRINT
+                                        paint = paintList[paintNum - 1]
+                                        print(f"\nPAINT INFO FOR WALL #{i+1}")
+                                        paint.printPaint()
+                                        tempCost = paint.costForArea(wallList[i].area, i+1)
+                                        print(f"Wall #{i+1} will cost ${tempCost}")
+                                        cost += tempCost
+                                        paintFlag = True
+
+                            #IF THEY DON'T WANT TO REUSE A PAINT THEN JUST ASK WHAT THE NEW PAINT SHOULD BE
+                            elif useSamePaint == 'n':
+                                paint = paintSelection(i+1, isExterior)
+                                paintList.append(paint)
+                                tempCost = paint.costForArea(wallList[i].area, i+1)
+                                print(f"Wall #{i+1} will cost ${tempCost}")
+                                cost += tempCost
+                            else:
+                                print("Please enter a valid answer")
+                    else:
+                        #if doesnt work just put this back right after the for loop and get rid of if else
+                        paint = paintSelection(i+1, isExterior)
+                        paintList.append(paint)
+                        tempCost = paint.costForArea(wallList[i].area, i+1)
+                        print(f"Wall #{i+1} will cost ${tempCost}")
+                        cost += tempCost
             else:
                 print("Please enter a valid answer")
     else:
@@ -130,13 +173,16 @@ def sheenCheck (wallNum):
 
 
 #GET INFO FOR HOW MANY WALLS,WINDOWS AND DOORS AND THEIR DIMENSIONS
-def getWallInfo(numWalls, wallList, insideOrOutside):
+def getWallInfo(numWalls, wallList, insideOrOutside, roomName):
     #IF MORE THAN ONE WALL
     if numWalls > 1:
         sameSize = ''
     #ERROR HANDLING, CHECK IF Y OR N HAS BEEN ENTERED
         while sameSize != 'y' and sameSize != 'n':
-            sameSize = input(f'Are the {insideOrOutside} walls of the house the same dimensions?(y/n):\n')
+            if insideOrOutside == 'inside':
+                sameSize = input(f'Are the {roomName} walls the same dimensions?(y/n):\n')
+            else:
+                sameSize = input(f'Are the {insideOrOutside} walls of the house the same dimensions?(y/n):\n')
 
             #SAME DIMENSIONS
             if sameSize == 'y':
@@ -372,38 +418,64 @@ class WindowOrDoor:
         self.area = area(width, height)
         self.painted = False
 ########################################
+class Room:
+    def __init__ (self, name, wallList, paintArea):
+        self.name = name
+        self.wallList = wallList
+        self.paintArea = paintArea
+########################################
 #PAINT JOB OBJECT, TO KEEP TRACK OF OUTSIDE AND INSIDE PAINT JOBS, CONTAINS A COST AND AN AREA
 class PaintJob:
-    def __init__(self, cost, area):
+    def __init__(self, cost, area, insideOrOutside):
         self.cost = cost
         self.area = area
+        self.inOrOut = insideOrOutside
 
-    #CALCULATES THE TOTAL AREA AND COST OF THE PAINT JOB GIVEN INFOR BY THE USER
-    def calcPaintJob(self, insideOrOutside):
-        #WALL INFO
-        numWalls = inputNum(f'How many walls on the {insideOrOutside} of the house are you painting?:\n')
-        wallList = []
-        wallList = getWallInfo(numWalls, wallList, insideOrOutside)
+#TTRYING WITH ROOMS
+    def calcPaintJob(self):
+        #FOR OUTSIDE PAINT JOB
+        if self.inOrOut == 'outside':
+            #WALL INFO
+            numWalls = inputNum(f'How many walls on the outside of the house are you painting?:\n')
+            wallList = []
+            
+            wallList = getWallInfo(numWalls, wallList, 'outside', '')
 
-        #PRINT AREA INFO
-        area = printAreaInfo(wallList)
-        print(f"Total {insideOrOutside} area to be painted: {area} sqft\n")
-        self.area += area
+            #PRINT AREA INFO
+            area = printAreaInfo(wallList)
+            print(f"Total outside area to be painted: {area} sqft\n")
+            self.area += area
 
-        #CHOOSE PAINT
-        isExterior = ''
-        match insideOrOutside:
-            case 'inside':
-                isExterior = 'n'
-            case 'outside':
-                isExterior = 'y'
-            case _:
-                print("Invalid answer typed into the insideOrOutside field, please enter 'inside' or 'outside'")
+            #CHOOSE PAINT
+            cost = choosePaint(area, wallList, numWalls, 'y')
+            print(f"\nYour entire {self.inOrOut} paint job will cost ${cost}\n")
+            self.cost += cost
 
-        cost = choosePaint(area, wallList, numWalls, isExterior)
-        print(f"\nYour entire {insideOrOutside} paint job will cost ${cost}\n")
-        self.cost += cost
+        #FOR INSIDE PAINT JOB
+        elif self.inOrOut == 'inside':
+            numRooms = inputNum(f'How many rooms on the inside of the house are you painting?:\n')
+            roomList = []
+            insideCost = 0
+            insideArea = 0
+            for i in range(numRooms):
+                wallList = []
+                roomName = input(f"What is the name of room #{i + 1}?:\n")
+                numWalls = inputNum(f'How many walls in the {roomName} are you painting?:\n')
+                wallList = getWallInfo(numWalls, wallList, 'inside', roomName)
+                area = printAreaInfo(wallList)
+                roomList.append(Room(roomName, wallList, area))
+                print(f"Total area to be painted in the {roomName}: {area} sqft\n")
+                insideArea += area
 
+                #CHOOSE PAINT FOR THE ROOM
+                cost = choosePaint(area, wallList, numWalls, 'n')
+                print(f"\nYour {roomName} paint job will cost ${cost}\n")
+                insideCost += cost
+            self.cost += insideCost
+            self.area += insideArea
+            print(f"Total inside area to be painted: {insideArea} sqft")
+            print(f"\nYour entire inside paint job will cost ${insideCost}\n")
+            
 ##############################################################################################################
 #MAIN
 if __name__ == '__main__':
@@ -417,17 +489,17 @@ if __name__ == '__main__':
             #OUTSIDE
             case 'o':
                 #CREATE NEW PAINT JOB OBJECT
-                outPaintJob = PaintJob(0, 0)
+                outPaintJob = PaintJob(0, 0, 'outside')
                 #FIGURE OUT THE COST AND AREA
-                outPaintJob.calcPaintJob('outside')
+                outPaintJob.calcPaintJob()
                 mainLoopFlag = True
     #############################################################################
             #INSIDE
             case 'i':
                 #CREATE NEW PAINT JOB
-                inPaintJob = PaintJob(0, 0)
+                inPaintJob = PaintJob(0, 0, 'inside')
                 #FIGURE OUT THE COST AND AREA
-                inPaintJob.calcPaintJob('inside')
+                inPaintJob.calcPaintJob()
                 mainLoopFlag = True
 
     #############################################################################
@@ -437,16 +509,16 @@ if __name__ == '__main__':
                 totalCost = 0
 
                 #MAKE AND FILL OUT OUTSIDE PAINT JOB
-                outPaintJob = PaintJob(0, 0)
-                outPaintJob.calcPaintJob('outside')
+                outPaintJob = PaintJob(0, 0, 'outside')
+                outPaintJob.calcPaintJob()
 
                 #ADD TO TOTALS
                 totalArea = outPaintJob.area
                 totalCost = outPaintJob.cost
 
                 #CREATE AND FILL OUT INSIDE PAINT JOB
-                inPaintJob = PaintJob(0, 0)
-                inPaintJob.calcPaintJob('inside')
+                inPaintJob = PaintJob(0, 0, 'inside')
+                inPaintJob.calcPaintJob()
 
                 #ADD TO TOTALS
                 totalArea += inPaintJob.area
